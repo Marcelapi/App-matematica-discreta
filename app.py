@@ -22,13 +22,6 @@ st.markdown("""
         text-align: center;
         margin-bottom: 25px;
     }
-    .card {
-        background-color: #F8FAFC;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #003366;
-        margin-bottom: 15px;
-    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -64,48 +57,52 @@ if st.button(
 ):
   k = random.randint(0, len(A_x_A))
   relacion_actual = sorted(list(set(random.sample(A_x_A, k))))
+  relacion_set = set(relacion_actual)
 
   # Contenedor visual para la relación
   st.markdown("### Relación Seleccionada ($R$)")
-  if relacion_actual:
-    st.success(f"**$R$ =** `{set(relacion_actual)}`")
+  if relacion_set:
+    st.success(f"**$R$ =** `{relacion_set}`")
   else:
     st.warning("**$R$ =** `∅` (Relación vacía)")
 
-  # --- 3. EVALUACIÓN DE PROPIEDADES ---
+  # --- 3. EVALUACIÓN Y DETALLE DE REFLEXIVIDAD ---
   pares_reflexivos = {(x, x) for x in A}
-  es_reflexiva = pares_reflexivos.issubset(set(relacion_actual))
+  # Encontramos cuáles pares de la forma (x, x) faltan en la relación
+  faltantes_reflexivos = pares_reflexivos - relacion_set
 
-  es_simetrica = True
-  for x, y in relacion_actual:
-    if (y, x) not in relacion_actual:
-      es_simetrica = False
-      break
+  # --- 4. EVALUACIÓN Y DETALLE DE SIMETRÍA ---
+  pares_sin_simetrico = []
+  for x, y in relacion_set:
+    if (y, x) not in relacion_set:
+      pares_sin_simetrico.append(
+          (x, y)
+      )  # Guardamos el par que no tiene su inverso (y, x)
 
-  # --- 4. RESULTADOS VISUALES ---
+  # --- 5. RESULTADOS VISUALES CON DETALLES ESPECÍFICOS ---
   st.markdown("### 📊 Análisis de Propiedades")
 
   col_ref, col_sim = st.columns(2)
 
   with col_ref:
     st.markdown("#### Reflexividad")
-    if es_reflexiva:
+    if not faltantes_reflexivos:
       st.success("✅ **Es Reflexiva**\n\nContiene todos los pares $(x, x)$.")
     else:
       st.error(
-          "❌ **No es Reflexiva**\n\nFaltan pares de identidad de la forma"
-          " $(x, x)$."
+          f"❌ **No es Reflexiva**\n\nFaltan los siguientes pares de identidad:"
+          f" `{faltantes_reflexivos}`"
       )
 
   with col_sim:
     st.markdown("#### Simetría")
-    if es_simetrica:
+    if not pares_sin_simetrico:
       st.success(
           "✅ **Es Simétrica**\n\nPara todo $(x, y) \\in R$, su inverso"
           " $(y, x)$ también está."
       )
     else:
       st.error(
-          "❌ **No es Simétrica**\n\nExisten pares que no tienen su simétrico"
-          " invertido."
+          "❌ **No es Simétrica**\n\nLos siguientes pares no tienen su inverso"
+          f" en $R$: `{set(pares_sin_simetrico)}`"
       )
