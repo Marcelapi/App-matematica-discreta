@@ -39,12 +39,14 @@ st.markdown(
 st.divider()
 
 # --- 1. DEFINICIÓN DEL CONJUNTO A ---
+# Usamos una lista o set ordenado para mostrar siempre {2, 4, 8}
 A = {2, 4, 8}
-A_x_A = [(x, y) for x in A for y in A]
+A_ordenado = sorted(list(A))
+A_x_A = [(x, y) for x in A_ordenado for y in A_ordenado]
 
 col1, col2 = st.columns(2)
 with col1:
-  st.info(f"**Conjunto A:**\n`{A}`")
+  st.info(f"**Conjunto A:**\n`{A_ordenado}`")
 with col2:
   st.info(f"**Producto Cartesiano (A x A):**\nTotal de pares: {len(A_x_A)}")
 
@@ -56,28 +58,28 @@ if st.button(
     type="primary",
 ):
   k = random.randint(0, len(A_x_A))
+  # Ordenamos la relación generada para que los pares aparezcan prolijos
   relacion_actual = sorted(list(set(random.sample(A_x_A, k))))
   relacion_set = set(relacion_actual)
 
-  # Contenedor visual para la relación
+  # Contenedor visual para la relación ordenando los pares por orden alfanumérico
   st.markdown("### Relación Seleccionada ($R$)")
   if relacion_set:
-    st.success(f"**$R$ =** `{relacion_set}`")
+    # Mostramos la relación ordenada como lista para que respete el orden
+    st.success(f"**$R$ =** `{sorted(list(relacion_set))}`")
   else:
     st.warning("**$R$ =** `∅` (Relación vacía)")
 
   # --- 3. EVALUACIÓN Y DETALLE DE REFLEXIVIDAD ---
   pares_reflexivos = {(x, x) for x in A}
-  # Encontramos cuáles pares de la forma (x, x) faltan en la relación
-  faltantes_reflexivos = pares_reflexivos - relacion_set
+  faltantes_reflexivos = sorted(list(pares_reflexivos - relacion_set))
 
   # --- 4. EVALUACIÓN Y DETALLE DE SIMETRÍA ---
   pares_sin_simetrico = []
   for x, y in relacion_set:
     if (y, x) not in relacion_set:
-      pares_sin_simetrico.append(
-          (x, y)
-      )  # Guardamos el par que no tiene su inverso (y, x)
+      pares_sin_simetrico.append((x, y))
+  pares_sin_simetrico = sorted(list(set(pares_sin_simetrico)))
 
   # --- 5. RESULTADOS VISUALES CON DETALLES ESPECÍFICOS ---
   st.markdown("### 📊 Análisis de Propiedades")
@@ -104,5 +106,5 @@ if st.button(
     else:
       st.error(
           "❌ **No es Simétrica**\n\nLos siguientes pares no tienen su inverso"
-          f" en $R$: `{set(pares_sin_simetrico)}`"
+          f" en $R$: `{pares_sin_simetrico}`"
       )
